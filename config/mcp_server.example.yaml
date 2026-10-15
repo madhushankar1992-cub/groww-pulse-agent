@@ -1,0 +1,9 @@
+# How the agent reaches the separate Pulse MCP Server (used from phase 5).
+# Prerequisites: Docs/input.md, section 7. This server is not required for local preview.
+# Copy to config/mcp_server.local.yaml (git-ignored).
+transport: stdio                 # or streamable_http
+command: python
+args: ["-m", "pulse_mcp_server"]
+url: null                        # e.g. http://127.0.0.1:8765/mcp for streamable_http
+timeout_seconds: 30
+recipient_env: PULSE_DRAFT_RECIPIENT   # env var holding your own address or alias

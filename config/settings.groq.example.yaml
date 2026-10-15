@@ -1,0 +1,18 @@
+# Use: pulse --config config/settings.groq.example.yaml preview
+# See Docs/input.md for key setup and the explicit historical snapshot command.
+# GROQ_API_KEY comes from the environment or the project .env file.
+model:
+  provider: groq
+  model: openai/gpt-oss-120b
+  classify_effort: low
+  reasoning_effort: medium
+  # Groq listed rates, checked 2026-10-11; update if pricing changes.
+  input_usd_per_mtok: 0.15
+  output_usd_per_mtok: 0.60
+  max_cost_usd_per_run: 3.0
+  # Sized for Groq's free tier (8,000 tokens/minute for gpt-oss-120b). A larger
+  # sample or batch triggers a 413 / LLM_RATE_LIMITED. Raise these on the Dev tier.
+  discovery_sample_size: 30
+  classify_batch_size: 5
+execution:
+  max_concurrent_model_calls: 1

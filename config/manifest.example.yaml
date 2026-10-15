@@ -1,0 +1,25 @@
+# Describes one public Google Play export. `pulse fetch` writes one of these automatically.
+store: google_play
+product_id: com.nextbillion.groww
+provider_ref: google-play-public
+acquisition_method: manual_public_export
+public_export_confirmed: true
+generated_at: "2026-10-06T09:00:00+05:30"
+coverage_start: 2026-07-27      # inclusive, source calendar
+coverage_end: 2026-10-05        # exclusive
+coverage_status: complete_for_declared_export   # or sampled / unknown
+storefront: IN
+source_timezone: Asia/Kolkata
+format: csv                     # csv / json / jsonl
+encoding: utf-8-sig
+date_precision: timestamp       # or date
+date_format: iso8601            # or %Y-%m-%d / %d/%m/%Y when date_precision is date
+sort_order: newest
+truncated: false
+columns:
+  text: content
+  date: at
+  rating: score
+  title: null
+  # Listed so they are documented; identity columns are never read.
+  identity_columns: [userName, userImage, reviewId, replyContent, repliedAt, appVersion]

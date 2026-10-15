@@ -1,0 +1,17 @@
+# Tools the Pulse Agent requires from the separate Pulse MCP Server project.
+# See Docs/architecture.md section 9. Names and input fields are the agreed interface;
+# the agent checks a live (or captured) `list_tools` result against this file before any write.
+version: 1
+required:
+  docs_create_document: [title, marker]
+  docs_write_content: [document_id, content_markdown]
+  docs_get_document: [document_id]
+  docs_find_by_marker: [marker]
+  gmail_create_draft: [to, subject, body_text, marker]
+  gmail_get_draft: [draft_id]
+  gmail_find_drafts: [marker]
+optional:
+  docs_get_page_count: [document_id]
+  gmail_update_draft: [draft_id, subject, body_text]
+# Never called, even when the server exposes them. Matched as case-insensitive substrings.
+forbidden_patterns: [send, forward, delete, share, permission, trash]

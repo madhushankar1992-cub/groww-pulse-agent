@@ -1,0 +1,35 @@
+# Copy to config/settings.local.yaml (git-ignored) and pass with: pulse --config config/settings.local.yaml ...
+# Every field is optional; omitted fields use the validated defaults in src/groww_pulse/config.py.
+# Operator setup and run checklist: Docs/input.md (paths are relative to the project root).
+# For Groq, use settings.groq.example.yaml instead (GROQ_API_KEY in the environment or .env).
+reporting:
+  timezone: Asia/Kolkata
+  history_weeks: 10            # 8-12
+  period: latest_complete_week
+analysis:
+  max_themes: 5                # hard cap; cannot be raised
+  min_reviews_per_highlighted_theme: 2
+  min_weekly_reviews: 10
+output:
+  max_words: 250               # hard cap; cannot be raised
+  email_mode: draft_only       # the only allowed value
+execution:
+  model_batch_attempts: 3
+  composition_repairs: 2
+  safe_mcp_attempts: 3
+  active_run_timeout_minutes: 15
+privacy:
+  spacy_model: en_core_web_sm
+  max_redaction_ratio: 0.4
+ingestion:
+  min_review_words: 9          # keep only reviews with more than 8 words
+model:
+  provider: groq               # key comes from GROQ_API_KEY; never put it here
+  model: openai/gpt-oss-120b
+  classify_effort: low
+  reasoning_effort: medium
+  discovery_sample_size: 300
+  classify_batch_size: 40
+  max_cost_usd_per_run: 3.0
+storage:
+  database: data/pulse.sqlite3
