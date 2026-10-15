@@ -32,6 +32,8 @@ class MCPConfig(Contract):
     url: str | None = None
     timeout_seconds: int = Field(default=30, ge=1, le=120)
     recipient_env: str = Field(default="PULSE_DRAFT_RECIPIENT", pattern=r"^[A-Z][A-Z0-9_]+$")
+    # Env var holding a bearer token for streamable_http servers (never stored in the YAML).
+    auth_token_env: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]+$")
 
     @model_validator(mode="after")
     def coherent(self):
@@ -94,9 +96,15 @@ async def session_context(config):
     from mcp.client.streamable_http import streamablehttp_client
     # Child process stderr is untrusted and may contain account details.
     with open(os.devnull, "w") as sink:
+        headers = None
+        if config.auth_token_env:
+            token = os.environ.get(config.auth_token_env, "").strip()
+            if not token:
+                raise PulseError(ErrorCode.CONFIG_INVALID)
+            headers = {"Authorization": f"Bearer {token}"}
         transport = (stdio_client(StdioServerParameters(command=config.command, args=list(config.args)),
                                   errlog=sink) if config.transport == "stdio" else
-                     streamablehttp_client(config.url, timeout=config.timeout_seconds,
+                     streamablehttp_client(config.url, headers=headers, timeout=config.timeout_seconds,
                                            sse_read_timeout=config.timeout_seconds))
         async with transport as streams:
             async with ClientSession(streams[0], streams[1],
