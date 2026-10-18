@@ -22,12 +22,13 @@ def response(content='{"answer":"yes"}', finish="stop"):
             "usage": {"prompt_tokens": 100, "completion_tokens": 20, "total_tokens": 120}}
 
 
-def adapter(handler, retries=0):
+def adapter(handler, retries=0, waits=0, sleeps=None):
     config = ModelConfig(provider="groq")
     budget = Budget(config)
     client = groq.Groq(api_key="fictional-key", max_retries=retries,
                        http_client=httpx.Client(transport=httpx.MockTransport(handler)))
-    return GroqLLM(config, budget, client=client), budget
+    pause = (lambda s: sleeps.append(s)) if sleeps is not None else (lambda s: None)
+    return GroqLLM(config, budget, client=client, sleep=pause, rate_limit_waits=waits), budget
 
 
 def call(llm, schema=SCHEMA):
@@ -166,3 +167,34 @@ def test_cli_groq_lazy_adapter_and_dotenv(conn, config, tmp_path, monkeypatch):
         return {"status": "PREVIEW_READY"}
     monkeypatch.setattr("groww_pulse.workflow.graph.execute", fake_execute)
     assert main(["--config", str(path), "preview", "--snapshot-id", str(snap.snapshot_id)]) == 0
+
+
+def test_rate_limit_waits_for_the_window_then_succeeds():
+    sleeps, attempts = [], []
+
+    def handler(request):
+        attempts.append(1)
+        if len(attempts) < 3:
+            return httpx.Response(429, headers={"retry-after": "7"}, json={"error": {"message": "tpm"}})
+        return httpx.Response(200, json=response())
+
+    llm, budget = adapter(handler, waits=4, sleeps=sleeps)
+    assert call(llm) == {"answer": "yes"}
+    assert len(attempts) == 3 and sleeps == [7.5, 7.5] and budget.calls == 1
+
+
+def test_rate_limit_gives_up_after_the_wait_cap():
+    sleeps = []
+    llm, _ = adapter(lambda r: httpx.Response(429, json={"error": {"message": "tpm"}}), waits=2, sleeps=sleeps)
+    with pytest.raises(PulseError, match="LLM_RATE_LIMITED"):
+        call(llm)
+    assert len(sleeps) == 2
+
+
+def test_request_too_large_is_not_waited_for():
+    sleeps = []
+    llm, _ = adapter(lambda r: httpx.Response(413, json={"error": {"message": "too large"}}),
+                     waits=5, sleeps=sleeps)
+    with pytest.raises(PulseError, match="LLM_RATE_LIMITED"):
+        call(llm)
+    assert sleeps == []
