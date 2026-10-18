@@ -270,3 +270,33 @@ def test_nodes_directly_accept_constructed_reference_state(conn, config, tmp_pat
         assert state["last_completed_node"] == name
         assert state["status"] in {"RUNNING", "PREVIEW_READY"}, state
     assert state["status"] == "PREVIEW_READY"
+
+
+def test_privacy_flagged_words_are_fed_back_to_the_next_attempt():
+    """A flagged word is told to the model, so a false positive does not repeat three times."""
+    import json
+
+    from groww_pulse.composition.composer import propose
+
+    class Echo:
+        model_ref = "echo"
+
+        def __init__(self):
+            self.user = None
+
+        def complete_json(self, *, system, user, schema, effort, max_tokens):
+            self.user = json.loads(user)
+            assert "avoid_terms" in system
+            raise AssertionError("stop after capturing")
+
+    from types import SimpleNamespace
+    analysis = SimpleNamespace(ranking=(), quotes=(), eligible_weekly=5)
+    snapshot = SimpleNamespace(source_status="complete", history_complete=True)
+    config = SimpleNamespace(model=SimpleNamespace(reasoning_effort="low"))
+    llm = Echo()
+    try:
+        propose(llm, analysis, snapshot, config, ["PRIVACY"], 100, ["Zed Capital"])
+    except AssertionError:
+        pass
+    assert llm.user["feedback"]["avoid_terms"] == ["Zed Capital"]
+    assert llm.user["feedback"]["codes"] == ["PRIVACY"]

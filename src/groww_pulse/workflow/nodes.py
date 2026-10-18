@@ -30,6 +30,7 @@ class Nodes:
     def __init__(self, conn, config, llm, budget, names, publisher=None, artifacts=Path("artifacts")):
         self.conn, self.config, self.llm, self.budget = conn, config, llm, budget
         self.names, self.publisher, self.artifacts = names, publisher, artifacts
+        self.avoid: tuple[str, ...] = ()  # in-memory only: words the privacy scan flagged
 
     def snapshot(self, state):
         return store.get_snapshot(self.conn, UUID(state["snapshot_id"]))
@@ -156,10 +157,15 @@ class Nodes:
         if not get_result(self.conn, state["run_id"], key):
             try:
                 comp = propose(self.llm, self.analysis(state), self.snapshot(state), self.config,
-                               state.get("validation_errors", ()), state.get("word_count", 0))
+                               state.get("validation_errors", ()), state.get("word_count", 0),
+                               self.avoid)
                 # Reject unsafe generated text before it reaches any persistence boundary.
                 texts = [s.text for s in comp.summaries] + [a.text for a in comp.actions]
-                value = ({"errors": ["PRIVACY"]} if any(detect(t, self.names) for t in texts)
+                flagged = sorted({t[d.start:d.end].strip()[:40] for t in texts
+                                  for d in detect(t, self.names)})
+                # Flagged words stay in memory only (never persisted) so the next attempt can avoid them.
+                self.avoid = tuple(sorted({*self.avoid, *flagged}))
+                value = ({"errors": ["PRIVACY"]} if flagged
                          else {"composition": comp.model_dump(mode="json")})
             except PulseError as exc:
                 if exc.code != ErrorCode.LLM_OUTPUT_INVALID:
