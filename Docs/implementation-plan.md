@@ -13,8 +13,8 @@
 | 2 — Themes, ranking, quote evidence | ✅ Implemented; live Groq run done |
 | 3 — Composition and local preview | ✅ Implemented; live preview `PREVIEW_READY` (219 words) |
 | 4 — LangGraph workflow, checkpoints, outcomes | ✅ Implemented; persistent resume tested |
-| 5 — MCP publication (Docs + Gmail) | Agent implemented (draft path and direct path); live send pending `MCP_AUTH_TOKEN` |
-| 6 — Evaluation and hand-off | ✅ Implemented; live acceptance send pending |
+| 5 — MCP publication (Docs + Gmail) | ✅ Implemented; live direct send completed 18 Oct 2026 |
+| 6 — Evaluation and hand-off | ✅ Implemented; live acceptance run recorded |
 | 7 — Optional weekly scheduling | ⬜ Optional |
 
 ---
@@ -289,7 +289,7 @@ Composition decisions:
 The gmail-docs-mcp server ([README](https://github.com/madhushankar1992-cub/gmail-docs-mcp)) exposes two families of tools over streamable HTTP at `/mcp`, protected by `Authorization: Bearer <MCP_AUTH_TOKEN>`:
 
 - **Direct tools:** `send_email` (to, subject, body, cc, bcc, is_html, `dry_run`; sends immediately) and `append_to_google_doc` (document, text, add_leading_newline; append-only).
-- **Pulse tools:** `docs_create_document`, `docs_write_content`, `docs_get_document`, `docs_find_by_marker`, `docs_get_page_count`, `gmail_create_draft`, `gmail_get_draft`, `gmail_find_drafts`; these never send.
+- **Pulse tools (described in the README; not exposed by the live deployment when checked on 18 October 2026):** `docs_create_document`, `docs_write_content`, `docs_get_document`, `docs_find_by_marker`, `docs_get_page_count`, `gmail_create_draft`, `gmail_get_draft`, `gmail_find_drafts`; these never send.
 - Scopes: `gmail.send`, `gmail.compose`, `documents`, `drive.file`. While the Google consent screen is in Testing, refresh tokens expire after 7 days.
 
 Decision (15 October 2026): the user asked the agent to **send the email and update the Doc**, so a direct publisher was added alongside the draft-only workflow. The draft-only workflow remains the default in configuration validation (`email_mode: draft_only`); `pulse publish-direct` is a separate, explicit command.
@@ -304,7 +304,7 @@ Decision (15 October 2026): the user asked the agent to **send the email and upd
 - [x] **Streamlit app:** `app.py` (import, analyse, review and publish) with `requirements.txt` and a secrets template.
 - [x] **Runbook:** [runbook.md](runbook.md) (setup, weekly flow, troubleshooting, limitations).
 - [x] **Acceptance report:** [acceptance-report.md](acceptance-report.md) mapping AC-01 to AC-12 to evidence.
-- [ ] **Live acceptance run:** append the note to the shared Doc and send one email to the configured recipient. Pending `MCP_AUTH_TOKEN`; record the Doc URL, message ID and word count in the acceptance report.
+- [x] **Live acceptance run (18 October 2026):** the 219-word note for 5–11 October was appended to the shared Doc and emailed to the configured recipient through `publish-direct`. Details in [acceptance-report.md](acceptance-report.md). The live server exposes only `send_email` and `append_to_google_doc`.
 
 ### Results
 
@@ -318,7 +318,7 @@ Decision (15 October 2026): the user asked the agent to **send the email and upd
 
 The labelled set is fictional and clear-cut, so 100% is an upper bound.
 
-**Milestone M6:** MVP complete once the live acceptance run is recorded.
+**Milestone M6:** MVP complete.
 
 ---
 

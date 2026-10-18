@@ -1,6 +1,6 @@
 # Acceptance Report — Phase 6
 
-Status: **MVP code complete; live delivery pending.** Evidence below was produced on 18 October 2026. Items marked *Pending* need the live MCP server token and have not been run.
+Status: **MVP complete; live delivery done on 18 October 2026.** Items marked *Pending* are checks the operator still performs by eye.
 
 ## Evaluation targets (labelled fictional set, 60 reviews, 5 themes)
 
@@ -47,6 +47,15 @@ Canary PII (emails, phones, URLs, handles, IDs, names) is planted in fixtures an
 - `pytest`: 176 tests pass. `ruff check src tests app.py`: clean.
 - Guardrail review before publishing the repository: **GO**.
 
-## Pending acceptance step
+## Live acceptance run (18 October 2026)
 
-Set `MCP_AUTH_TOKEN` in `.env`, run `pulse publish-direct <run_id>`, read the note, then `--send --approve`. Record the Doc URL, the message ID from the ledger, and the word count here.
+| Item | Value |
+| --- | --- |
+| Run | `f5b4d9da-2d1c-4407-80ea-cfd6f68aefa0` (week 5–11 Oct 2026, 120 eligible reviews) |
+| Word count | 219 (limit 250) |
+| Doc | https://docs.google.com/document/d/1PUJW7yKw7vHRH-CnDyvAYStRvF2g7F0aOUlaKUJqb2k/edit (note appended) |
+| Email | sent to the configured recipient, Gmail message ID `1a14f9d25ec9169e` |
+| Command | `pulse publish-direct <run_id> --send --approve`; ledger shows `doc_append: DONE`, `email: SENT` |
+| Server tools seen | `send_email`, `append_to_google_doc` (the live deployment does not expose the Pulse draft tools) |
+
+The operator confirms by opening the Doc and the inbox. The one-page layout check (AC-06) and the read-back (AC-09) are manual on this path.
