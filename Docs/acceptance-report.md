@@ -58,4 +58,6 @@ Canary PII (emails, phones, URLs, handles, IDs, names) is planted in fixtures an
 | Command | `pulse publish-direct <run_id> --send --approve`; ledger shows `doc_append: DONE`, `email: SENT` |
 | Server tools seen | `send_email`, `append_to_google_doc` (the live deployment does not expose the Pulse draft tools) |
 
+A second live send was made from the deployed Streamlit app on 18 October 2026 (tab 3, approval box and typed `SEND`): the app reported `doc_append: DONE` and `email: SENT`. This proves the cloud path (upload, Groq analysis, validation, Doc append, email) end to end. Because the cloud app does not keep its ledger across restarts, the Doc and inbox now hold two notes for the week.
+
 The operator confirms by opening the Doc and the inbox. The one-page layout check (AC-06) and the read-back (AC-09) are manual on this path.
