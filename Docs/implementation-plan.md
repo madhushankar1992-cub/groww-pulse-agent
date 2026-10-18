@@ -4,7 +4,7 @@
 **Scope:** The Pulse Agent only. The Pulse MCP Server (Docs + Gmail) is a separate project. This plan delivers the agent and the tool contract it needs from that server.
 **Source:** Google Play only. Apple App Store deferred.
 
-**Inputs and operator steps:** [input.md](input.md) is the checklist for Groq credentials, the existing snapshot, preview/resume commands, and deferred MCP setup. Follow it for running the current implementation. Further implementation phases remain on hold until the user requests them.
+**Inputs and operator steps:** [input.md](input.md) is the checklist for Groq credentials, the existing snapshot, preview/resume commands, and deferred MCP setup. Follow it for running the current implementation. Phases 0–6 are complete; Phase 7 (scheduling) is optional and not started.
 
 | Phase | Status |
 | --- | --- |
@@ -124,7 +124,7 @@ Two fixes came from the real run. First, short clean reviews ("good app") are ke
 
 ### Decisions made while implementing
 
-- **Groq option (12 October 2026):** `llm/groq_llm.py` and a provider factory support the official Groq SDK using `GROQ_API_KEY`. `config/settings.groq.example.yaml` selects `openai/gpt-oss-120b`; `openai/gpt-oss-20b` is also supported. Strict JSON requests are followed by local validation against the original schema. Provider-specific defaults, token/cost accounting, safe error mapping and bounded SDK retries are implemented. The CLI loads `.env` without overriding the environment. A live Groq run remains pending the user's key; start a new Groq run rather than resuming an Anthropic run with changed config.
+- **Groq option (12 October 2026):** `llm/groq_llm.py` and a provider factory support the official Groq SDK using `GROQ_API_KEY`. `config/settings.groq.example.yaml` selects `openai/gpt-oss-120b`; `openai/gpt-oss-20b` is also supported. Strict JSON requests are followed by local validation against the original schema. Provider-specific defaults, token/cost accounting, safe error mapping and bounded SDK retries are implemented. The CLI loads `.env` without overriding the environment. Live Groq runs are done; start a new Groq run rather than resuming an Anthropic run with changed config.
 - **Model:** Claude Opus 5.5 (`claude-opus-5-5`) via the official `anthropic` SDK, with structured JSON output and server-side refusal fallback (`fallbacks: "default"`). Effort is `low` for classification and `medium` for taxonomy and quotes. Analysis code depends only on the `llm.base.LLM` protocol.
 - **Review filter (requested):** only English reviews with **more than 8 words**, with no emoji anywhere in the retained body, are kept (`ingestion.min_review_words: 9`). Shorter ones are excluded at import as `TEXT_TOO_SHORT`.
 - **Scope of classification:** only the reporting week is classified, because ranking is weekly. The history window feeds taxonomy discovery through a deterministic sample (≤ 300, stratified by week × rating, always including some report-week reviews).
@@ -151,7 +151,7 @@ Two fixes came from the real run. First, short clean reviews ("good app") are ke
 - [x] A fabricated excerpt is rejected, and the fallback quote is verbatim. A quote crossing a `[redacted]` span is rejected.
 - [x] Too few weekly reviews → `INSUFFICIENT_EVIDENCE` with **zero** model calls. Too few supported themes → `INSUFFICIENT_EVIDENCE`.
 - [x] Budget exceeded → `BUDGET_EXCEEDED`. A missing API key → `LLM_AUTH_FAILED` (exit 4).
-- [ ] Live model analysis on the refreshed snapshot (69 weekly reviews, 1,231 history), pending `ANTHROPIC_API_KEY`. The earlier 95/1,615 counts predate the stricter English/emoji policy.
+- [x] Live model analysis with Groq (`openai/gpt-oss-120b`) on the 5–11 October 2026 snapshot (120 weekly reviews, 1,238 history): 3 supported themes, run `f5b4d9da…`. The earlier 69-review snapshot is kept for history only.
 
 **Milestone M2:** top themes and quotes are reproducible and traceable from the DB.
 
@@ -256,9 +256,9 @@ Composition decisions:
 
 - An ambiguous timeout never causes a second create.
 - A resume after a Gmail failure reuses the verified Doc.
-- [ ] Live trial against the real Pulse MCP Server: pending server configuration, credentials, and recipient. No real Doc or Gmail draft was created in this implementation session.
+- [x] Live trial against the deployed gmail-docs-mcp server (18 October 2026): the note was appended to the shared Doc and emailed once through `publish-direct` (see Phase 6). The draft-only Pulse tools were not exposed by that deployment, so `pulse publish` was not run live.
 
-**Milestone M5:** agent-side implementation is complete and verified with fictional data through both an in-process fake and the actual SDK stdio transport. Live Google delivery remains an acceptance step, not a completed result.
+**Milestone M5:** agent-side implementation is complete, verified with fictional data (in-process fake and the SDK stdio transport) and live through the direct path.
 
 ### Implementation notes
 
@@ -301,7 +301,7 @@ Decision (15 October 2026): the user asked the agent to **send the email and upd
 - [x] **Scenario runs:** normal week (live run `f5b4d9da…`), sparse week, MCP failure with recovery, Groq rate limit (`LLM_RATE_LIMITED`).
 - [x] **Privacy scan** across every local boundary (database, checkpoints, logs, artifacts) with planted canaries; repository scanned for secrets before publishing.
 - [x] **Direct publisher:** `integrations/gmail_docs.py`, `pulse publish-direct`, bearer-token support for streamable HTTP, write-ahead ledger, `--send --approve` gate.
-- [x] **Streamlit app:** `app.py` (import, analyse, review and publish) with `requirements.txt` and a secrets template.
+- [x] **Streamlit app:** `app.py` (import, analyse, review and publish; frontend and backend in one app) with `requirements.txt` and a secrets template. Deployed on Streamlit Community Cloud from `main` with secrets configured; a Diagnostics panel lists secret names only.
 - [x] **Runbook:** [runbook.md](runbook.md) (setup, weekly flow, troubleshooting, limitations).
 - [x] **Acceptance report:** [acceptance-report.md](acceptance-report.md) mapping AC-01 to AC-12 to evidence.
 - [x] **Live acceptance run (18 October 2026):** the 219-word note for 5–11 October was appended to the shared Doc and emailed to the configured recipient through `publish-direct`. Details in [acceptance-report.md](acceptance-report.md). The live server exposes only `send_email` and `append_to_google_doc`.
