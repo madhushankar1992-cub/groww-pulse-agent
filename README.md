@@ -3,7 +3,9 @@
 This agent turns public Google Play reviews of Groww (`com.nextbillion.groww`) into a one-page weekly pulse: the top 3 themes, 3 verbatim quotes, and 3 action ideas. It publishes the pulse to Google Docs and creates a Gmail draft through the **separate Pulse MCP Server** project. This repository is the agent only.
 
 - [Problem statement](Docs/problemStatement.md) · [Architecture](Docs/architecture.md) · [Implementation plan](Docs/implementation-plan.md)
-- Status: **Phases 0-5 are implemented on the agent side.** Anthropic and Groq adapters are available. Local tests use fictional model output and MCP resources. A live model run and real Google Docs/Gmail acceptance still need credentials and the separate MCP server.
+- **Live app (Streamlit):** https://groww-pulse-age-5evygnyufunrac3ndmrcyc.streamlit.app/
+- **Code:** https://github.com/madhushankar1992-cub/groww-pulse-agent · **MCP server:** https://gmail-docs-mcp.vercel.app/mcp
+- Status: **Phases 0-6 are implemented on the agent side.** Anthropic and Groq adapters are available. Local tests use fictional model output and MCP resources. A live model run and real Google Docs/Gmail acceptance still need credentials and the separate MCP server.
 
 ## Setup (Windows, project-local Python)
 
