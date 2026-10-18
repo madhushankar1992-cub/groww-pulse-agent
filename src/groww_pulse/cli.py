@@ -178,6 +178,13 @@ def build_parser() -> argparse.ArgumentParser:
     ev.add_argument("--themes", type=Path, default=Path("tests/eval/reference_themes.json"))
     ev.add_argument("--out", type=Path, default=Path("artifacts/evaluation"))
     ev.set_defaults(func=cmd_evaluate)
+    weekly = sub.add_parser("weekly", help="scheduled chain: fetch, import, snapshot, preview (never sends)")
+    weekly.add_argument("--as-of", type=_date)
+    weekly.add_argument("--out", type=Path, default=None, help="export folder (default raw_exports/fetch_<date>)")
+    weekly.add_argument("--status", type=Path, default=Path("data/logs/weekly_status.json"))
+    weekly.add_argument("--confirm-public-source", action="store_true",
+                        help="fetch fresh public reviews first (otherwise reuse the newest export in --out)")
+    weekly.set_defaults(func=cmd_weekly)
     layout = sub.add_parser("confirm-layout", help="record that you checked the Doc fits one page")
     layout.add_argument("run_id", type=UUID)
     layout.set_defaults(func=cmd_confirm_layout)
@@ -207,6 +214,19 @@ def cmd_evaluate(args):
     (args.out / "evaluation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     _emit({"status": "OK", **report})
     return EXIT_OK if report["passed"] else EXIT_FAILED
+
+
+def cmd_weekly(args):
+    from datetime import date as _date
+
+    from groww_pulse.scheduling import run_weekly
+
+    as_of = (args.as_of or _date.today()).isoformat()
+    out = args.out or Path("raw_exports") / f"fetch_{as_of}"
+    status = run_weekly(as_of=as_of, out=out, status_path=args.status, fetch=args.confirm_public_source,
+                        config=args.config)
+    _emit({"status": "OK", **{k: v for k, v in status.items()}})
+    return EXIT_OK if status["outcome"] in ("PREVIEW_READY", "ALREADY_DONE") else EXIT_BLOCKED
 
 
 def cmd_inspect(args):

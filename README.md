@@ -100,6 +100,10 @@ All test data is fictional.
 
 `publish-direct` without `--send` only checks settings and the pulse locally. It needs `MCP_AUTH_TOKEN`, `PULSE_DRAFT_RECIPIENT` (the one recipient) and `PULSE_GOOGLE_DOC_ID` in `.env`, and uses [gmail-docs-mcp](https://github.com/madhushankar1992-cub/gmail-docs-mcp). A write-ahead ledger (`data/direct_publications.json`) never repeats a step whose outcome is unknown; on ephemeral hosting the ledger is lost on restart, so check the Doc and inbox before re-running.
 
+## Weekly schedule (Phase 7)
+
+`pulse weekly --confirm-public-source` runs fetch, import, snapshot and preview, then stops; it never sends. `scripts/schedule.ps1 -Install` registers it as a Windows task for Mondays 09:00. Sending stays manual (`publish-direct`). See the [runbook](Docs/runbook.md).
+
 ## Streamlit app
 
 ```powershell

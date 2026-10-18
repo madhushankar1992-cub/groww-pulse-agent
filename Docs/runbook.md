@@ -24,8 +24,16 @@ Run every command from the project root. The CLI reads `.env` automatically. Nev
 | Publish (direct) | `pulse publish-direct <run_id>` then `--send --approve` | Appends to the Doc and sends one email. **Irreversible.** |
 | Publish (draft) | `pulse publish --snapshot-id <id> --mcp-config config/mcp_server.local.yaml` | Doc plus an unsent draft. |
 | Evaluate | `pulse evaluate` | Scores the labelled fictional set (Phase 6). |
+| Weekly (automated) | `pulse weekly --confirm-public-source` | Fetch → import → snapshot → preview; never sends. Status in `data/logs/weekly_status.json`. |
 
 The Streamlit app (`streamlit run app.py`) wraps the same commands.
+
+### Scheduling (Phase 7)
+
+1. `.\scripts\schedule.ps1 -DryRun` shows the task; `-Install` registers `GrowwPulseWeekly` (Mondays 09:00 PC time); `-Uninstall` removes it.
+2. After a run, `.\scripts\schedule.ps1 -Status` prints outcome, step and codes only.
+3. If the outcome is `PREVIEW_READY`, read `artifacts/<run_id>/pulse.md`, then `pulse publish-direct <run_id> --send --approve`.
+4. `BLOCKED` with `COVERAGE_MISSING` means the export did not reach the end of last week: run again later. Optionally set `PULSE_NOTIFY_URL` (https) to receive the status JSON.
 
 ## 3. Troubleshooting
 

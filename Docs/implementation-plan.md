@@ -4,7 +4,7 @@
 **Scope:** The Pulse Agent only. The Pulse MCP Server (Docs + Gmail) is a separate project. This plan delivers the agent and the tool contract it needs from that server.
 **Source:** Google Play only. Apple App Store deferred.
 
-**Inputs and operator steps:** [input.md](input.md) is the checklist for Groq credentials, the existing snapshot, preview/resume commands, and deferred MCP setup. Follow it for running the current implementation. Phases 0–6 are complete; Phase 7 (scheduling) is optional and not started.
+**Inputs and operator steps:** [input.md](input.md) is the checklist for Groq credentials, the existing snapshot, preview/resume commands, and deferred MCP setup. Follow it for running the current implementation. Phases 0–7 are complete.
 
 | Phase | Status |
 | --- | --- |
@@ -15,7 +15,7 @@
 | 4 — LangGraph workflow, checkpoints, outcomes | ✅ Implemented; persistent resume tested |
 | 5 — MCP publication (Docs + Gmail) | ✅ Implemented; live direct send completed 18 Oct 2026 |
 | 6 — Evaluation and hand-off | ✅ Implemented; live acceptance run recorded |
-| 7 — Optional weekly scheduling | ⬜ Optional |
+| 7 — Weekly scheduling | ✅ Implemented; live run done; task registration is an operator step |
 
 ---
 
@@ -322,13 +322,26 @@ The labelled set is fictional and clear-cut, so 100% is an upper bound.
 
 ---
 
-## Phase 7 — Optional Weekly Scheduling
+## Phase 7 — Weekly Scheduling ✅
 
-- A host scheduler (Windows Task Scheduler / cron) runs every Monday at 09:00 IST: `pulse fetch` (if approved) → `import` → `snapshot` → `publish`.
-- A freshness check means stale input never becomes "this week".
-- The `publication_key` lock prevents a duplicate weekly Doc or draft.
-- `BLOCKED` outcomes (expired MCP auth, missing data) are surfaced through a configured, content-free notification.
-- Scheduled runs stay draft-only (`pulse publish`); `publish-direct` is never scheduled because it sends mail.
+**Goal:** an unattended weekly preview that never does anything irreversible.
+
+### Design decisions
+
+- The scheduled chain is `config check` → `fetch` (opt-in `--confirm-public-source`) → `import` → `snapshot` → `preview`. It **stops before publication**: `publish-direct` sends mail and appends to a Doc, so a human reads `artifacts/<run_id>/pulse.md` and runs `pulse publish-direct <run_id> --send --approve`. (The live MCP deployment also does not expose the draft-only tools, so a scheduled `pulse publish` is not possible against it.)
+- **Freshness:** the snapshot must report `READY` for the latest complete Mon–Sun week. Stale or missing coverage ends `BLOCKED / COVERAGE_MISSING`, so old data never becomes "this week".
+- **Idempotent:** a second run for a reporting week that already has `PREVIEW_READY` returns `ALREADY_DONE` after only the config check; no fetch or model call. The weekly publication key still protects against duplicate publication.
+- **Content-free status:** `data/logs/weekly_status.json` holds outcome, failed step, a code, window dates, run and snapshot IDs and the word count; never review text. If `PULSE_NOTIFY_URL` (https only) is set, the same JSON is POSTed to it; failures never break the run.
+
+### Tasks
+
+- [x] `scheduling.py` and `pulse weekly [--as-of] [--out] [--status] [--confirm-public-source]`.
+- [x] `scripts/schedule.ps1`: registers a Windows Scheduled Task `GrowwPulseWeekly` (Mondays 09:00 PC time). Nothing is installed without `-Install`; `-DryRun`, `-Uninstall` and `-Status` are supported.
+- [x] Tests (`tests/unit/test_scheduling.py`): full chain never publishes, idempotent rerun, blocked step reports a code only, stale data blocks, export reuse without fetch, https-only content-free notification.
+- [x] Live run (18 October 2026): `pulse weekly --as-of 2026-10-12` produced `PREVIEW_READY` (run `44667893…`, 197 words, week 5–11 Oct); the immediate rerun returned `ALREADY_DONE`.
+- [ ] Operator step: run `.\scripts\schedule.ps1 -Install` on the machine that should run the job. Task Scheduler only runs while that PC is on; a missed run starts when it wakes (`StartWhenAvailable`).
+
+**Milestone M7:** the weekly preview is automated and safe; sending stays a human decision.
 
 ---
 
