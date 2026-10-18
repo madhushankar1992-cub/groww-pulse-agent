@@ -10,11 +10,11 @@
 | --- | --- |
 | 0 — Setup, config, contracts | ✅ Implemented |
 | 1 — Acquisition, privacy, storage, snapshots | ✅ Implemented |
-| 2 — Themes, ranking, quote evidence | ✅ Implemented (live run needs `ANTHROPIC_API_KEY`) |
-| 3 — Composition and local preview | Implemented; fake-model tests pass |
-| 4 — LangGraph workflow, checkpoints, outcomes | Implemented; persistent resume tested |
-| 5 — MCP publication (Docs + Gmail draft) | Agent implemented; live server acceptance pending |
-| 6 — Evaluation and hand-off | ⬜ Not started |
+| 2 — Themes, ranking, quote evidence | ✅ Implemented; live Groq run done |
+| 3 — Composition and local preview | ✅ Implemented; live preview `PREVIEW_READY` (219 words) |
+| 4 — LangGraph workflow, checkpoints, outcomes | ✅ Implemented; persistent resume tested |
+| 5 — MCP publication (Docs + Gmail) | Agent implemented (draft path and direct path); live send pending `MCP_AUTH_TOKEN` |
+| 6 — Evaluation and hand-off | ✅ Implemented; live acceptance send pending |
 | 7 — Optional weekly scheduling | ⬜ Optional |
 
 ---
@@ -282,14 +282,43 @@ Composition decisions:
 
 ## Phase 6 — Evaluation, Acceptance, Hand-off
 
-1. Labelled evaluation set (60–100 sanitised reviews, fictionalised where needed). Targets: theme agreement ≥ 85%, quote validity 100%, count accuracy 100%.
-2. Scenario runs: a normal week, a sparse week, and an MCP failure with recovery.
-3. A privacy scan across every boundary (architecture §6.4).
-4. A real acceptance run for one week, recording the Doc URL, draft ID, word count, evidence map, and outcome.
-5. README/runbook: setup, fetch/import, preview, publish, resume, troubleshooting, limitations (export sampling, exact-row dedup, English-only privacy, model uncertainty).
-6. Acceptance report mapping AC-01 to AC-12 to evidence.
+**Goal:** prove the MVP against measurable targets and hand it over with a runbook and acceptance report.
 
-**Milestone M6:** MVP complete.
+### MCP server tools reviewed (15–18 October 2026)
+
+The gmail-docs-mcp server ([README](https://github.com/madhushankar1992-cub/gmail-docs-mcp)) exposes two families of tools over streamable HTTP at `/mcp`, protected by `Authorization: Bearer <MCP_AUTH_TOKEN>`:
+
+- **Direct tools:** `send_email` (to, subject, body, cc, bcc, is_html, `dry_run`; sends immediately) and `append_to_google_doc` (document, text, add_leading_newline; append-only).
+- **Pulse tools:** `docs_create_document`, `docs_write_content`, `docs_get_document`, `docs_find_by_marker`, `docs_get_page_count`, `gmail_create_draft`, `gmail_get_draft`, `gmail_find_drafts`; these never send.
+- Scopes: `gmail.send`, `gmail.compose`, `documents`, `drive.file`. While the Google consent screen is in Testing, refresh tokens expire after 7 days.
+
+Decision (15 October 2026): the user asked the agent to **send the email and update the Doc**, so a direct publisher was added alongside the draft-only workflow. The draft-only workflow remains the default in configuration validation (`email_mode: draft_only`); `pulse publish-direct` is a separate, explicit command.
+
+### Tasks
+
+- [x] **Labelled evaluation set:** `tests/eval/labelled_reviews.jsonl` (60 fictional reviews, 12 per theme, more than 8 words, English, no emoji, no identifiers) and `reference_themes.json` (5 themes).
+- [x] **Harness:** `evaluation/harness.py` and `pulse evaluate` score theme agreement, count accuracy (independent recount) and quote validity (verbatim excerpts). Targets: agreement ≥ 85%, quote validity 100%, count accuracy 100%.
+- [x] **Scenario runs:** normal week (live run `f5b4d9da…`), sparse week, MCP failure with recovery, Groq rate limit (`LLM_RATE_LIMITED`).
+- [x] **Privacy scan** across every local boundary (database, checkpoints, logs, artifacts) with planted canaries; repository scanned for secrets before publishing.
+- [x] **Direct publisher:** `integrations/gmail_docs.py`, `pulse publish-direct`, bearer-token support for streamable HTTP, write-ahead ledger, `--send --approve` gate.
+- [x] **Streamlit app:** `app.py` (import, analyse, review and publish) with `requirements.txt` and a secrets template.
+- [x] **Runbook:** [runbook.md](runbook.md) (setup, weekly flow, troubleshooting, limitations).
+- [x] **Acceptance report:** [acceptance-report.md](acceptance-report.md) mapping AC-01 to AC-12 to evidence.
+- [ ] **Live acceptance run:** append the note to the shared Doc and send one email to the configured recipient. Pending `MCP_AUTH_TOKEN`; record the Doc URL, message ID and word count in the acceptance report.
+
+### Results
+
+| Measure | Result |
+| --- | --- |
+| Theme agreement (live Groq, 60 fictional reviews) | 100% |
+| Quote validity / count accuracy | 100% / 100% |
+| Real week 5–11 Oct 2026 | 120 eligible reviews, `PREVIEW_READY`, 219 words |
+| Tests / lint | 176 passed / Ruff clean |
+| Pre-publication guardrail review | GO |
+
+The labelled set is fictional and clear-cut, so 100% is an upper bound.
+
+**Milestone M6:** MVP complete once the live acceptance run is recorded.
 
 ---
 
@@ -299,7 +328,7 @@ Composition decisions:
 - A freshness check means stale input never becomes "this week".
 - The `publication_key` lock prevents a duplicate weekly Doc or draft.
 - `BLOCKED` outcomes (expired MCP auth, missing data) are surfaced through a configured, content-free notification.
-- Still draft-only, so the human sends.
+- Scheduled runs stay draft-only (`pulse publish`); `publish-direct` is never scheduled because it sends mail.
 
 ---
 

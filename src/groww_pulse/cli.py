@@ -173,6 +173,11 @@ def build_parser() -> argparse.ArgumentParser:
     direct.add_argument("--send", action="store_true", help="perform the writes (default: validate only)")
     direct.add_argument("--approve", action="store_true", help="confirm you have read artifacts/<run_id>/pulse.md")
     direct.set_defaults(func=cmd_publish_direct)
+    ev = sub.add_parser("evaluate", help="score theme agreement on the labelled fictional review set")
+    ev.add_argument("--dataset", type=Path, default=Path("tests/eval/labelled_reviews.jsonl"))
+    ev.add_argument("--themes", type=Path, default=Path("tests/eval/reference_themes.json"))
+    ev.add_argument("--out", type=Path, default=Path("artifacts/evaluation"))
+    ev.set_defaults(func=cmd_evaluate)
     layout = sub.add_parser("confirm-layout", help="record that you checked the Doc fits one page")
     layout.add_argument("run_id", type=UUID)
     layout.set_defaults(func=cmd_confirm_layout)
@@ -186,6 +191,22 @@ def cmd_publish_direct(args):
     report = publish(run_dir, approve=args.approve, dry_run=not args.send)
     _emit({"status": "OK", **report})
     return EXIT_OK
+
+
+def cmd_evaluate(args):
+    from groww_pulse.evaluation.harness import evaluate, load_dataset, reference_taxonomy
+    from groww_pulse.llm.base import Budget
+    from groww_pulse.llm.factory import build_llm
+
+    config = load_config(args.config)
+    rows = load_dataset(args.dataset)
+    taxonomy = reference_taxonomy(args.themes)
+    report = evaluate(build_llm(config.model, Budget(config.model)), rows, taxonomy,
+                      batch_size=config.model.classify_batch_size, effort=config.model.classify_effort)
+    args.out.mkdir(parents=True, exist_ok=True)
+    (args.out / "evaluation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    _emit({"status": "OK", **report})
+    return EXIT_OK if report["passed"] else EXIT_FAILED
 
 
 def cmd_inspect(args):

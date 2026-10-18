@@ -1,0 +1,27 @@
+[
+  {
+    "theme_id": "customer_support",
+    "name": "Customer Support",
+    "definition": "Customer support is unhelpful and replies take days"
+  },
+  {
+    "theme_id": "app_performance",
+    "name": "App Performance",
+    "definition": "The app is slow, crashes or fails to load"
+  },
+  {
+    "theme_id": "trading_features",
+    "name": "Trading Features",
+    "definition": "Order placement and trading features are limited or buggy"
+  },
+  {
+    "theme_id": "fees_charges",
+    "name": "Fees Charges",
+    "definition": "Hidden or high fees and charges"
+  },
+  {
+    "theme_id": "payments_withdrawals",
+    "name": "Payments Withdrawals",
+    "definition": "Problems adding money or withdrawing funds"
+  }
+]

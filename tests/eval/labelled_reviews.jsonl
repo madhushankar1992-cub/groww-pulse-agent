@@ -1,0 +1,60 @@
+{"id": "e001", "text": "The customer support team never answers my ticket even after five days of waiting", "rating": 1, "theme": "customer_support"}
+{"id": "e002", "text": "Support agent kept sending copy pasted replies and never solved my actual problem at all", "rating": 1, "theme": "customer_support"}
+{"id": "e003", "text": "I tried calling the helpline many times but nobody picked up the phone", "rating": 2, "theme": "customer_support"}
+{"id": "e004", "text": "Chat support closed my complaint without any resolution and I am very disappointed", "rating": 1, "theme": "customer_support"}
+{"id": "e005", "text": "Very slow response from the support desk, my issue is still open after two weeks", "rating": 1, "theme": "customer_support"}
+{"id": "e006", "text": "Support executives do not understand the problem and keep transferring me between teams", "rating": 2, "theme": "customer_support"}
+{"id": "e007", "text": "I raised a ticket about my account and received only an automated reply, no human help", "rating": 1, "theme": "customer_support"}
+{"id": "e008", "text": "Nobody from customer care called me back as promised, really poor service experience", "rating": 1, "theme": "customer_support"}
+{"id": "e009", "text": "The help section has no useful answers and the support chat is always offline", "rating": 2, "theme": "customer_support"}
+{"id": "e010", "text": "Whenever I contact support they ask the same questions again and never fix anything", "rating": 1, "theme": "customer_support"}
+{"id": "e011", "text": "Customer care promised a callback within a day but I am still waiting for a week", "rating": 1, "theme": "customer_support"}
+{"id": "e012", "text": "Complaint was marked resolved by support although nothing was actually done to help me", "rating": 2, "theme": "customer_support"}
+{"id": "e013", "text": "The app crashes every time I open it after the latest update, please fix soon", "rating": 1, "theme": "app_performance"}
+{"id": "e014", "text": "App is extremely slow during market hours and the screen freezes for many seconds", "rating": 1, "theme": "app_performance"}
+{"id": "e015", "text": "It keeps showing a blank white screen when I launch it on my phone each morning", "rating": 2, "theme": "app_performance"}
+{"id": "e016", "text": "After updating, the application hangs on the loading logo and never opens properly", "rating": 1, "theme": "app_performance"}
+{"id": "e017", "text": "Charts take forever to load and the whole app lags when I switch between tabs", "rating": 1, "theme": "app_performance"}
+{"id": "e018", "text": "The app says there is no internet connection even though my wifi works perfectly fine", "rating": 2, "theme": "app_performance"}
+{"id": "e019", "text": "Constant crashes while checking my portfolio, it closes by itself without any warning", "rating": 1, "theme": "app_performance"}
+{"id": "e020", "text": "Very laggy interface and the prices refresh so slowly that the data is already stale", "rating": 1, "theme": "app_performance"}
+{"id": "e021", "text": "I cannot log in because the app keeps freezing on the pin screen every single time", "rating": 2, "theme": "app_performance"}
+{"id": "e022", "text": "Battery drain is huge and the app becomes unresponsive after being open for ten minutes", "rating": 1, "theme": "app_performance"}
+{"id": "e023", "text": "Notifications arrive late and the app stutters badly on my older android phone model", "rating": 1, "theme": "app_performance"}
+{"id": "e024", "text": "Server error messages appear again and again when I try to open my watchlist page", "rating": 2, "theme": "app_performance"}
+{"id": "e025", "text": "The basket order feature does not allow mixing options and futures in a single basket", "rating": 2, "theme": "trading_features"}
+{"id": "e026", "text": "I wish there were more advanced chart indicators and drawing tools for technical analysis", "rating": 2, "theme": "trading_features"}
+{"id": "e027", "text": "Stop loss orders get rejected randomly and the reason shown is never clear to me", "rating": 3, "theme": "trading_features"}
+{"id": "e028", "text": "Placing a limit order is confusing because the order window hides the price field", "rating": 2, "theme": "trading_features"}
+{"id": "e029", "text": "There is no way to place a bracket order on this platform which other brokers offer", "rating": 2, "theme": "trading_features"}
+{"id": "e030", "text": "My sell order stayed pending even though the price crossed my limit by a good margin", "rating": 3, "theme": "trading_features"}
+{"id": "e031", "text": "Option chain data is missing the greeks and open interest changes that traders need", "rating": 2, "theme": "trading_features"}
+{"id": "e032", "text": "Cannot modify a submitted order quickly, the edit button often does nothing at all", "rating": 2, "theme": "trading_features"}
+{"id": "e033", "text": "Please add a proper strategy builder for options, the current order screen is too basic", "rating": 3, "theme": "trading_features"}
+{"id": "e034", "text": "The watchlist limit is too small and I cannot create more lists for my favourite stocks", "rating": 2, "theme": "trading_features"}
+{"id": "e035", "text": "Order execution price differed from what was shown at the time I pressed the buy button", "rating": 2, "theme": "trading_features"}
+{"id": "e036", "text": "Futures and options section feels incomplete, missing margin calculator and position analysis tools", "rating": 3, "theme": "trading_features"}
+{"id": "e037", "text": "They charged me hidden fees that were never shown before I placed the trade today", "rating": 1, "theme": "fees_charges"}
+{"id": "e038", "text": "Brokerage and other charges are far higher than what the advertised pricing page says", "rating": 1, "theme": "fees_charges"}
+{"id": "e039", "text": "I was billed an unexpected account maintenance fee without any prior notice or message", "rating": 2, "theme": "fees_charges"}
+{"id": "e040", "text": "The charges statement is confusing and I cannot understand why so many deductions happened", "rating": 1, "theme": "fees_charges"}
+{"id": "e041", "text": "Delivery trades were charged extra and nobody could explain the difference in the final amount", "rating": 1, "theme": "fees_charges"}
+{"id": "e042", "text": "Platform fee was added on every order which makes small trades completely unprofitable", "rating": 2, "theme": "fees_charges"}
+{"id": "e043", "text": "DP charges feel unreasonable for selling just a single share from my demat account", "rating": 1, "theme": "fees_charges"}
+{"id": "e044", "text": "Transparency about taxes and fees is poor, the contract note shows many unknown items", "rating": 1, "theme": "fees_charges"}
+{"id": "e045", "text": "Charged a penalty for low balance that I never agreed to when opening the account", "rating": 2, "theme": "fees_charges"}
+{"id": "e046", "text": "Hidden charges everywhere, I only noticed them after checking my ledger very carefully", "rating": 1, "theme": "fees_charges"}
+{"id": "e047", "text": "The pricing changed suddenly and the new brokerage per order is much more expensive now", "rating": 1, "theme": "fees_charges"}
+{"id": "e048", "text": "Why am I paying extra fees for pledging my holdings, this was not mentioned anywhere", "rating": 2, "theme": "fees_charges"}
+{"id": "e049", "text": "My withdrawal request has been pending for five days and the money has not arrived", "rating": 1, "theme": "payments_withdrawals"}
+{"id": "e050", "text": "UPI payment failed but the amount was deducted from my bank and not credited here", "rating": 1, "theme": "payments_withdrawals"}
+{"id": "e051", "text": "Adding funds through net banking keeps failing with an unknown error every single time", "rating": 2, "theme": "payments_withdrawals"}
+{"id": "e052", "text": "I cannot withdraw my money to my bank account, the app only shows processing status", "rating": 1, "theme": "payments_withdrawals"}
+{"id": "e053", "text": "Money added to my wallet is not reflected in the balance even after many hours", "rating": 1, "theme": "payments_withdrawals"}
+{"id": "e054", "text": "Payout to my bank was reversed twice and nobody explains where the amount went", "rating": 2, "theme": "payments_withdrawals"}
+{"id": "e055", "text": "The bank linking step fails repeatedly so I am unable to deposit any funds at all", "rating": 1, "theme": "payments_withdrawals"}
+{"id": "e056", "text": "Fund transfer limit is too low and I cannot add the amount I need for investing", "rating": 1, "theme": "payments_withdrawals"}
+{"id": "e057", "text": "Refund for the failed transaction has not come back to my account after ten days", "rating": 2, "theme": "payments_withdrawals"}
+{"id": "e058", "text": "Withdrawal took more than a week while the same transfer elsewhere is instant", "rating": 1, "theme": "payments_withdrawals"}
+{"id": "e059", "text": "I paid through UPI and the order was cancelled but the payment was never returned", "rating": 1, "theme": "payments_withdrawals"}
+{"id": "e060", "text": "Instant withdrawal option is always disabled for me and the normal one is very slow", "rating": 2, "theme": "payments_withdrawals"}
