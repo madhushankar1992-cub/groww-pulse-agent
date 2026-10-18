@@ -22,12 +22,29 @@ UPLOADS = ROOT / "raw_exports" / "uploads"
 SECRET_KEYS = ("GROQ_API_KEY", "MCP_AUTH_TOKEN", "PULSE_DRAFT_RECIPIENT", "PULSE_GOOGLE_DOC_ID",
                "GMAIL_DOCS_MCP_URL")
 
+SECRETS_FOUND: list[str] = []
+SECRETS_ERROR = ""
+
+
+def _flatten(node, out):
+    """Collect KEY=value pairs, also from [sections] in case the secrets were pasted under one."""
+    for key in list(node.keys()):
+        value = node[key]
+        if hasattr(value, "keys"):
+            _flatten(value, out)
+        else:
+            out[str(key).strip()] = str(value).strip()
+
+
 try:  # Streamlit Cloud secrets -> environment (visible to the CLI subprocesses).
+    _found: dict[str, str] = {}
+    _flatten(st.secrets, _found)
+    SECRETS_FOUND = sorted(_found)
     for key in SECRET_KEYS:
-        if key in st.secrets and not os.environ.get(key):
-            os.environ[key] = str(st.secrets[key])
-except Exception:
-    pass
+        if _found.get(key) and not os.environ.get(key):
+            os.environ[key] = _found[key]
+except Exception as exc:  # Only the error class is shown, never its text.
+    SECRETS_ERROR = type(exc).__name__
 
 
 def pulse(*args):
@@ -73,6 +90,10 @@ with st.sidebar:
     for key in ("GROQ_API_KEY", "MCP_AUTH_TOKEN", "PULSE_DRAFT_RECIPIENT", "PULSE_GOOGLE_DOC_ID"):
         st.write(("✅ " if os.environ.get(key) else "❌ ") + key)
     st.caption("Set these in Streamlit Secrets (or .env locally). Values are never displayed.")
+    with st.expander("Diagnostics"):
+        st.write("Secret names found:", ", ".join(SECRETS_FOUND) or "none")
+        if SECRETS_ERROR:
+            st.write("Reading secrets failed:", SECRETS_ERROR)
 
 tab_data, tab_run, tab_publish = st.tabs(["1 · Reviews", "2 · Analyse", "3 · Review & publish"])
 
